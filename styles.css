@@ -57,6 +57,9 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .hero-features li { display: flex; align-items: center; gap: 10px; font-size: 11px; line-height: 1.45; }
 .hero-features .icon { width: 28px; height: 28px; color: #00aaff; }
 .hero-cta { gap: 32px; }
+.hero-chat-link { display: flex; align-items: center; gap: 8px; width: fit-content; max-width: 100%; min-height: 44px; margin-top: 5px; color: #b8dfff; font-size: 11px; line-height: 1.5; text-underline-offset: 4px; }
+.hero-chat-link .icon { width: 17px; height: 17px; }
+.hero-chat-link:hover { color: white; text-decoration: underline; }
 .hero-note { font-size: 10px; color: #a8bfd7; margin: 12px 0 0; }
 .exchange-visual { position: absolute; left: 50%; right: 8%; top: 38%; display: flex; align-items: center; justify-content: center; gap: 20px; filter: drop-shadow(0 3px 14px #01102d); transform: rotate(-3deg); }
 .currency-item { display: flex; align-items: center; flex-direction: column; gap: 14px; transform: rotate(3deg); }
@@ -137,19 +140,23 @@ details[open] .faq-plus:after { transform: rotate(0); }
 .faq-answer { padding: 0 30px 21px 0; }
 .faq-answer p { color: #4c6179; font-size: 12px; line-height: 1.85; margin: 0; }
 
-/* The existing Calendly address is the confirmed contact destination. */
+/* Direct chat comes first; scheduling remains available alongside it. */
 .contact { position: relative; background: radial-gradient(ellipse at 20% 90%,#05305c,#031326 70%); padding-block: 65px; }
 .anchor-alias { position: absolute; top: 0; }
 .contact-layout { display: grid; grid-template-columns: 1.25fr 1fr; gap: 100px; align-items: center; }
 .contact h2 { font-size: 42px; line-height: 1.12; }
 .contact-layout > div > p:not(.eyebrow) { color: #b8cce1; font-size: 14px; line-height: 1.75; margin: 20px 0 0; }
 .contact-card { border: 1px solid #20496b; border-radius: 20px; background: linear-gradient(140deg,#082642,#051a30); padding: 28px; box-shadow: 0 12px 35px #0002; }
-.contact-label { display: flex; align-items: center; gap: 9px; font-size: 9px; letter-spacing: .12em; color: #6cc9ff; font-weight: 600; }
-.contact-label .icon { width: 18px; height: 18px; }
+.contact-calendar-icon { width: 27px; height: 27px; color: #6cc9ff; }
 .contact-card h3 { font-size: 25px; line-height: 1.2; letter-spacing: -.035em; margin: 17px 0 12px; }
 .contact-layout .contact-card > p { font-size: 12px; line-height: 1.6; margin: 0 0 22px; max-width: 275px; }
 .button-full { display: flex; width: 100%; justify-content: space-between; min-height: 49px; font-size: 13px; border-radius: 12px; }
-.contact-note { display: block; text-align: center; font-size: 9px; line-height: 1.5; color: #a7bdd2; margin-top: 12px; }
+.contact-note { display: block; text-align: center; font-size: 11px; line-height: 1.5; color: #a7bdd2; margin-top: 12px; }
+.contact-chat > p { max-width: 430px; }
+.contact-telegram { margin-top: 25px; gap: 13px; color: #031326; }
+.telegram-account { display: block; color: #b8cce1; font-size: 11px; line-height: 1.6; margin-top: 12px; }
+.button-secondary { background: transparent; color: #d8edff; border-color: #547c9e; box-shadow: none; }
+.button-secondary:hover { background: #0a2e4f; box-shadow: none; }
 .closing-bar { padding-block: 25px; background: linear-gradient(110deg,#0053ad,#009bff 80%,#0071e7); border-block: 1px solid #2395e0; }
 .closing-inner { display: flex; align-items: center; gap: 34px; }
 .closing-inner .brand { padding-right: 32px; border-right: 1px solid #e2f4ff70; }
@@ -341,9 +348,11 @@ details[open] .faq-plus:after { transform: rotate(0); }
   .contact h2 { font-size: 32px; }
   .contact-layout > div > p:not(.eyebrow) { font-size: 12px; margin-top: 15px; }
   .contact-card { padding: 24px; }
+  .contact-telegram { width: 100%; justify-content: center; padding-inline: 16px; font-size: 13px; }
+  .telegram-account { font-size: 11px; }
   .contact-card h3 { font-size: 25px; }
   .contact-card h3 br { display: none; }
-  .contact-layout .contact-card > p { max-width: none; }
+  .contact-layout .contact-card > p { max-width: none; margin: 0 0 22px; }
   .closing-bar { padding-block: 24px; }
   .closing-inner { display: grid; grid-template-columns: 1fr; gap: 20px; text-align: center; justify-items: center; }
   .closing-inner .brand { gap: 11px; }

@@ -1,6 +1,10 @@
 # Cobalt Urbana
 
-Landing estática ARS → USDT. Conserva el símbolo original de la marca y el Meta Pixel `1556371032264770` con un único `PageView` por carga.
+Landing estática ARS → USDT. Conserva el símbolo original de la marca y usa el Meta Pixel `1743600580129283` con un único `PageView` por carga.
+
+Los enlaces con `data-contact-channel` envían un evento `Contact` por clic, con el parámetro `contact_channel` igual a `telegram` o `calendly`. El enlace a Telegram aparece en el hero y como primera opción en la sección de contacto; Calendly conserva `#cta` y queda disponible como alternativa para agendar. Los enlaces internos a `#contacto` solo desplazan la página y no registran contactos. `Contact` mide el clic: no confirma un mensaje enviado ni una reunión reservada. Si el Pixel no está disponible, los enlaces siguen funcionando.
+
+Verificación local sin enviar eventos a Meta: `node --test tests/meta-pixel.test.cjs`.
 
 ## Vista previa local
 
@@ -18,7 +22,8 @@ Proyecto estático, sin build ni dependencias. Publicar la raíz del repositorio
 
 ## Contenido y contacto
 
-- Contacto confirmado: https://calendly.com/gestionloly/nueva-reunion. No se inventó un WhatsApp ni un correo.
+- Telegram informado por el usuario: https://t.me/cambiocobalt (@cambiocobalt). Abre una conversación directa; la persona debe enviar su mensaje. No se integró un bot ni una base de datos.
+- Calendly se conserva como alternativa: https://calendly.com/gestionloly/nueva-reunion. No se inventó un WhatsApp ni un correo.
 - Se conserva `#agendar` como enlace a la sección de contacto.
 - No hay una cotización automática ni un formulario que aparente enviar solicitudes: el visitante elige una reunión en Calendly.
 - Faltan datos verificables de la empresa/prestador, horarios, comisiones, mínimos y plazos. No se publicaron cifras, licencias ni garantías sin acreditar. Las respuestas indican qué debe acordarse con el equipo. Reemplazarlas por condiciones concretas cuando el negocio las confirme.

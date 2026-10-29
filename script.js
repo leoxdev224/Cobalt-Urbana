@@ -1,5 +1,13 @@
 'use strict';
 
+document.querySelectorAll('[data-contact-channel]').forEach(button => {
+  button.addEventListener('click', () => {
+    if (typeof window.fbq === 'function') {
+      window.fbq('track', 'Contact', { contact_channel: button.dataset.contactChannel });
+    }
+  });
+});
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
 
