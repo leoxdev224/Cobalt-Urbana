@@ -50,17 +50,22 @@ test('initializes only the new Pixel and queues one PageView', () => {
   assert.ok(html.includes(`tr?id=${pixelId}&amp;ev=PageView&amp;noscript=1`));
 });
 
-test('Telegram and Calendly keep their correct external destinations', () => {
+test('all contact buttons open the same Telegram-first route, including the white footer CTA', () => {
   assert.equal((html.match(/id="cta"/g) || []).length, 1);
-  assert.match(html, /<a[^>]*id="cta"[^>]*href="https:\/\/calendly\.com\/gestionloly\/nueva-reunion"[^>]*target="_blank"/);
+  assert.match(html, /<a[^>]*id="cta"[^>]*href="https:\/\/t\.me\/cambiocobalt"[^>]*target="_blank"/);
+  const buttons = [...html.matchAll(/<a\b[^>]*class="[^"]*\bbutton\b[^"]*"[^>]*>/g)].map(match => match[0]);
+  assert.ok(buttons.some(tag => tag.includes('button-white')));
+  assert.ok(buttons.length >= 5);
+  for (const tag of buttons) {
+    assert.ok(tag.includes('href="https://t.me/cambiocobalt"'), 'A contact button still scrolls or bypasses Telegram: ' + tag);
+    assert.ok(tag.includes('data-contact-channel="telegram"'));
+  }
+  assert.equal(/href="https:\/\/calendly\.com\//.test(html), false);
   const { contacts } = loadLanding();
-  assert.equal(contacts.filter(contact => contact.dataset.contactChannel === 'telegram').length, 2);
-  assert.equal(contacts.filter(contact => contact.dataset.contactChannel === 'calendly').length, 1);
+  assert.ok(contacts.length >= 5);
   for (const contact of contacts) {
-    const destination = contact.dataset.contactChannel === 'telegram'
-      ? 'https://t.me/cambiocobalt'
-      : 'https://calendly.com/gestionloly/nueva-reunion';
-    assert.ok(contact.tag.includes(`href="${destination}"`));
+    assert.equal(contact.dataset.contactChannel, 'telegram');
+    assert.ok(contact.tag.includes('href="https://t.me/cambiocobalt"'));
     assert.ok(contact.tag.includes('target="_blank"'));
     assert.ok(contact.tag.includes('rel="noopener noreferrer"'));
   }

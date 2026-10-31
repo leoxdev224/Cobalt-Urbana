@@ -2,7 +2,7 @@
 
 Landing estática ARS → USDT. Conserva el símbolo original de la marca y usa el Meta Pixel `1743600580129283` con un único `PageView` por carga.
 
-Los enlaces con `data-contact-channel` envían un evento `Contact` por clic, con el parámetro `contact_channel` igual a `telegram` o `calendly`. El enlace a Telegram aparece en el hero y como primera opción en la sección de contacto; Calendly conserva `#cta` y queda disponible como alternativa para agendar. Los enlaces internos a `#contacto` solo desplazan la página y no registran contactos. `Contact` mide el clic: no confirma un mensaje enviado ni una reunión reservada. Si el Pixel no está disponible, los enlaces siguen funcionando.
+Todos los botones de contacto abren https://t.me/cambiocobalt y envían un evento `Contact` por clic, con `contact_channel: telegram`. El CTA principal de la sección de contacto conserva `#cta`. El recorrido es único: Telegram → conversación con el equipo → reunión. Calendly se comparte manualmente dentro del chat; ya no es una alternativa directa desde la landing. El botón blanco final también abre Telegram. Los enlaces de navegación a `#contacto` solo desplazan la página y no registran contactos. `Contact` mide el clic: no confirma un mensaje enviado ni una reunión reservada. Si el Pixel no está disponible, los enlaces siguen funcionando.
 
 Verificación local sin enviar eventos a Meta: `node --test tests/meta-pixel.test.cjs`.
 
@@ -23,9 +23,9 @@ Proyecto estático, sin build ni dependencias. Publicar la raíz del repositorio
 ## Contenido y contacto
 
 - Telegram informado por el usuario: https://t.me/cambiocobalt (@cambiocobalt). Abre una conversación directa; la persona debe enviar su mensaje. No se integró un bot ni una base de datos.
-- Calendly se conserva como alternativa: https://calendly.com/gestionloly/nueva-reunion. No se inventó un WhatsApp ni un correo.
+- El equipo comparte https://calendly.com/gestionloly/nueva-reunion dentro de Telegram para coordinar la reunión, según el recorrido confirmado por el usuario. La landing no envía mensajes ni entrega automáticamente el enlace de Calendly.
 - Se conserva `#agendar` como enlace a la sección de contacto.
-- No hay una cotización automática ni un formulario que aparente enviar solicitudes: el visitante elige una reunión en Calendly.
+- No hay una cotización automática ni un formulario que aparente enviar solicitudes: el visitante inicia el contacto en Telegram y coordina la reunión con el equipo.
 - Faltan datos verificables de la empresa/prestador, horarios, comisiones, mínimos y plazos. No se publicaron cifras, licencias ni garantías sin acreditar. Las respuestas indican qué debe acordarse con el equipo. Reemplazarlas por condiciones concretas cuando el negocio las confirme.
 - La imagen de ciudad/notebook es ilustrativa; no representa oficinas o activos de la empresa.
 - El video anterior se conserva en el repositorio pero ya no se descarga en la nueva página.
