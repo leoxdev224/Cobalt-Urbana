@@ -52,12 +52,12 @@ test('initializes only the new Pixel and queues one PageView', () => {
 
 test('all contact buttons open the same Telegram-first route, including the white footer CTA', () => {
   assert.equal((html.match(/id="cta"/g) || []).length, 1);
-  assert.match(html, /<a[^>]*id="cta"[^>]*href="https:\/\/t\.me\/cambiocobalt"[^>]*target="_blank"/);
+  assert.match(html, /<a[^>]*id="cta"[^>]*href="https:\/\/t\.me\/Cobaltcambios"[^>]*target="_blank"/);
   const buttons = [...html.matchAll(/<a\b[^>]*class="[^"]*\bbutton\b[^"]*"[^>]*>/g)].map(match => match[0]);
   assert.ok(buttons.some(tag => tag.includes('button-white')));
   assert.ok(buttons.length >= 5);
   for (const tag of buttons) {
-    assert.ok(tag.includes('href="https://t.me/cambiocobalt"'), 'A contact button still scrolls or bypasses Telegram: ' + tag);
+    assert.ok(tag.includes('href="https://t.me/Cobaltcambios"'), 'A contact button still scrolls or bypasses Telegram: ' + tag);
     assert.ok(tag.includes('data-contact-channel="telegram"'));
   }
   assert.equal(/href="https:\/\/calendly\.com\//.test(html), false);
@@ -65,7 +65,7 @@ test('all contact buttons open the same Telegram-first route, including the whit
   assert.ok(contacts.length >= 5);
   for (const contact of contacts) {
     assert.equal(contact.dataset.contactChannel, 'telegram');
-    assert.ok(contact.tag.includes('href="https://t.me/cambiocobalt"'));
+    assert.ok(contact.tag.includes('href="https://t.me/Cobaltcambios"'));
     assert.ok(contact.tag.includes('target="_blank"'));
     assert.ok(contact.tag.includes('rel="noopener noreferrer"'));
   }
