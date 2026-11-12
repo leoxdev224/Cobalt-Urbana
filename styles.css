@@ -378,6 +378,23 @@ details[open] .faq-plus:after { transform: rotate(0); }
   .confidence-cards h3 { font-size: 12px; }
   .confidence-cards p { font-size: 11px; }
 }
+.prefilter { background: #eef5fc; color: #061d36; color-scheme: light; }
+.prefilter-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 80px; align-items: start; }
+.prefilter-layout h2 { font-size: clamp(30px, 3vw, 40px); line-height: 1.15; letter-spacing: -.03em; margin: 0 0 16px; }
+.prefilter-layout > div > p { color: #445d77; font-size: 14px; line-height: 1.7; max-width: 380px; }
+.prefilter-form { background: white; border: 1px solid #d3e1ef; border-radius: 16px; padding: 30px; }
+.prefilter-form > label, .prefilter-form > div > label, .prefilter-form legend { display: block; color: #092744; font-size: 14px; font-weight: 700; margin: 0 0 9px; }
+.prefilter-form select, .prefilter-form input[type="text"] { width: 100%; min-height: 48px; padding: 10px 12px; margin: 0 0 22px; border: 1px solid #9eb5ca; border-radius: 8px; background: white; color: #092744; font: inherit; font-size: 14px; }
+.prefilter-form select:focus-visible, .prefilter-form input:focus-visible { outline: 3px solid #007ac2; outline-offset: 2px; }
+.prefilter-form fieldset { border: 0; padding: 0; margin: 0 0 24px; }
+.prefilter-choice { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px 10px 0; font-size: 14px; cursor: pointer; }
+.prefilter-choice input { width: 19px; height: 19px; accent-color: #007bc6; }
+.prefilter-submit { display: flex; width: 100%; justify-content: space-between; border-radius: 12px; color: #031326; cursor: pointer; }
+.prefilter-note { color: #526c84; font-size: 12px; line-height: 1.6; margin: 14px 0 0; }
+@media (max-width: 680px) {
+  .prefilter-layout { grid-template-columns: 1fr; gap: 20px; }
+  .prefilter-form { padding: 22px; }
+}
 @media (prefers-reduced-motion:reduce) {
   html { scroll-behavior: auto; }
   *, *:before, *:after { transition: none !important; animation: none !important; }

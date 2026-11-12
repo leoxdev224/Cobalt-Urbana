@@ -1,12 +1,35 @@
 'use strict';
 
-document.querySelectorAll('[data-contact-channel]').forEach(button => {
-  button.addEventListener('click', () => {
-    if (typeof window.fbq === 'function') {
-      window.fbq('track', 'Contact', { contact_channel: button.dataset.contactChannel });
-    }
-  });
+const prefilterForm = document.querySelector('#prefilter-form');
+const negocio = document.querySelector('#negocio');
+const otroNegocio = document.querySelector('#otro-negocio');
+const detalleNegocio = document.querySelector('#detalle-negocio');
+
+negocio.addEventListener('change', () => {
+  const isOther = negocio.value === 'Otro';
+  otroNegocio.hidden = !isOther;
+  detalleNegocio.required = isOther;
+  detalleNegocio.setCustomValidity('');
+  if (!isOther) detalleNegocio.value = '';
 });
+
+prefilterForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const answers = new FormData(prefilterForm);
+  const business = answers.get('negocio') === 'Otro' ? answers.get('detalle-negocio').trim() : answers.get('negocio');
+  if (!business) {
+    detalleNegocio.setCustomValidity('Contanos a qué se dedica tu negocio.');
+    detalleNegocio.reportValidity();
+    return;
+  }
+  detalleNegocio.setCustomValidity('');
+  const message = 'Hola, quiero consultar por una operación.\n\nVolumen diario estimado: ' + answers.get('volumen') + '\nNegocio: ' + business + '\nPrimera vez cambiando pesos a USDT: ' + answers.get('primera-vez');
+  const url = 'https://t.me/Cobaltcambios?text=' + encodeURIComponent(message);
+  if (typeof window.fbq === 'function') window.fbq('track', 'Contact', { contact_channel: 'telegram' });
+  window.open(url, '_blank', 'noopener,noreferrer');
+});
+
+detalleNegocio.addEventListener('input', () => detalleNegocio.setCustomValidity(''));
 
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
@@ -54,9 +77,10 @@ if ('IntersectionObserver' in window) {
 
   const mobileCta = document.querySelector('.mobile-cta');
   let contactVisible = false;
+  let filterVisible = false;
   let heroActionPassed = false;
   const updateContactShortcut = () => {
-    const hidden = contactVisible || !heroActionPassed;
+    const hidden = contactVisible || filterVisible || !heroActionPassed;
     mobileCta.classList.toggle('is-hidden', hidden);
     mobileCta.tabIndex = hidden ? -1 : 0;
   };
@@ -65,6 +89,11 @@ if ('IntersectionObserver' in window) {
     updateContactShortcut();
   }, { threshold: 0.15 });
   contactObserver.observe(document.querySelector('#contacto'));
+  const filterObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => { filterVisible = entry.isIntersecting; });
+    updateContactShortcut();
+  }, { threshold: 0.15 });
+  filterObserver.observe(document.querySelector('#prefiltro'));
   const heroActionObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       heroActionPassed = !entry.isIntersecting && entry.boundingClientRect.bottom < 0;

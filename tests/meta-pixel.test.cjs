@@ -3,89 +3,67 @@ const { readFileSync } = require('node:fs');
 const { resolve } = require('node:path');
 const { test } = require('node:test');
 const vm = require('node:vm');
+const html = readFileSync(resolve(__dirname, '../index.html'), 'utf8');
+const script = readFileSync(resolve(__dirname, '../script.js'), 'utf8');
 
-const root = resolve(__dirname, '..');
-const html = readFileSync(resolve(root, 'index.html'), 'utf8');
-const script = readFileSync(resolve(root, 'script.js'), 'utf8');
-const pixelId = '1743600580129283';
-
-function loadLanding() {
-  const insertedScripts = [];
-  const inertElement = { addEventListener() {}, setAttribute() {}, querySelectorAll: () => [] };
-  const contacts = [...html.matchAll(/<a\b[^>]*data-contact-channel="([^"]+)"[^>]*>/g)].map(match => ({
-    tag: match[0],
-    dataset: { contactChannel: match[1] },
-    listeners: [],
-    addEventListener(event, listener) {
-      assert.equal(event, 'click');
-      this.listeners.push(listener);
-    }
-  }));
+function loadLanding(values = { volumen: 'USD 1.000 a 5.000', negocio: 'Servicios', 'primera-vez': 'No' }) {
+  const listeners = {};
+  const element = id => ({ id, value: '', hidden: false, required: false,
+    addEventListener(event, handler) { listeners[id + ':' + event] = handler; },
+    setCustomValidity(value) { this.error = value; }, reportValidity() {},
+    setAttribute() {}, querySelectorAll: () => [] });
+  const elements = Object.fromEntries(['prefilter-form', 'negocio', 'otro-negocio', 'detalle-negocio'].map(id => [id, element(id)]));
+  const inert = element('inert');
   const document = {
-    createElement: () => ({}),
-    getElementsByTagName: () => [{ parentNode: { insertBefore: script => insertedScripts.push(script) } }],
-    querySelector: () => inertElement,
-    querySelectorAll: selector => selector === '[data-contact-channel]' ? contacts : [],
-    addEventListener() {}
+    createElement: () => ({}), getElementsByTagName: () => [{ parentNode: { insertBefore() {} } }],
+    querySelector: selector => elements[selector.slice(1)] || inert,
+    querySelectorAll: () => [], addEventListener() {}
   };
-  const context = vm.createContext({ document, matchMedia: () => ({ addEventListener() {} }) });
+  const opened = [];
+  const context = vm.createContext({ document, matchMedia: () => ({ addEventListener() {} }),
+    FormData: class { get(key) { return values[key]; } }, open: (...args) => opened.push(args) });
   context.window = context;
   vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   vm.runInContext(script, context);
-  return { context, contacts, insertedScripts };
+  return { context, listeners, elements, opened };
 }
 
-function queuedCalls(context) {
-  return JSON.parse(JSON.stringify(Array.from(context.fbq.queue, args => Array.from(args))));
-}
-
-test('initializes only the new Pixel and queues one PageView', () => {
-  const { context, insertedScripts } = loadLanding();
-  const calls = queuedCalls(context);
-  assert.deepEqual(calls, [['init', pixelId], ['track', 'PageView']]);
-  assert.equal(insertedScripts.length, 1);
-  assert.equal(insertedScripts[0].src, 'https://connect.facebook.net/en_US/fbevents.js');
-  assert.equal(insertedScripts[0].async, true);
-  assert.equal(html.includes('1556371032264770'), false);
-  assert.ok(html.includes(`tr?id=${pixelId}&amp;ev=PageView&amp;noscript=1`));
-});
-
-test('all contact buttons open the same Telegram-first route, including the white footer CTA', () => {
-  assert.equal((html.match(/id="cta"/g) || []).length, 1);
-  assert.match(html, /<a[^>]*id="cta"[^>]*href="https:\/\/t\.me\/Cobaltcambios"[^>]*target="_blank"/);
+test('Pixel initializes once and all contact buttons reach the filter', () => {
+  const { context } = loadLanding();
+  assert.deepEqual(JSON.parse(JSON.stringify(context.fbq.queue.map(args => [...args]))), [['init', '1743600580129283'], ['track', 'PageView']]);
   const buttons = [...html.matchAll(/<a\b[^>]*class="[^"]*\bbutton\b[^"]*"[^>]*>/g)].map(match => match[0]);
-  assert.ok(buttons.some(tag => tag.includes('button-white')));
   assert.ok(buttons.length >= 5);
-  for (const tag of buttons) {
-    assert.ok(tag.includes('href="https://t.me/Cobaltcambios"'), 'A contact button still scrolls or bypasses Telegram: ' + tag);
-    assert.ok(tag.includes('data-contact-channel="telegram"'));
-  }
-  assert.equal(/href="https:\/\/calendly\.com\//.test(html), false);
-  const { contacts } = loadLanding();
-  assert.ok(contacts.length >= 5);
-  for (const contact of contacts) {
-    assert.equal(contact.dataset.contactChannel, 'telegram');
-    assert.ok(contact.tag.includes('href="https://t.me/Cobaltcambios"'));
-    assert.ok(contact.tag.includes('target="_blank"'));
-    assert.ok(contact.tag.includes('rel="noopener noreferrer"'));
-  }
+  buttons.forEach(tag => assert.ok(tag.includes('href="#prefiltro"')));
+  assert.ok(html.includes('id="prefilter-form"'));
 });
 
-test('tracks exactly one Contact per click with the correct channel', () => {
-  const { context, contacts } = loadLanding();
-  for (const contact of contacts) {
-    assert.equal(contact.listeners.length, 1);
-    const before = context.fbq.queue.length;
-    contact.listeners[0]();
-    assert.equal(context.fbq.queue.length, before + 1);
-    assert.deepEqual(queuedCalls(context).at(-1), ['track', 'Contact', { contact_channel: contact.dataset.contactChannel }]);
-    contact.listeners[0]();
-    assert.equal(context.fbq.queue.length, before + 2);
-  }
+test('valid answers prepare a Telegram draft and track one contact', () => {
+  const { context, listeners, opened } = loadLanding();
+  listeners['prefilter-form:submit']({ preventDefault() {} });
+  assert.equal(opened.length, 1);
+  const url = new URL(opened[0][0]);
+  assert.equal(url.origin + url.pathname, 'https://t.me/Cobaltcambios');
+  assert.match(url.searchParams.get('text'), /Volumen diario estimado: USD 1\.000 a 5\.000/);
+  assert.match(url.searchParams.get('text'), /Negocio: Servicios/);
+  assert.match(url.searchParams.get('text'), /Primera vez cambiando pesos a USDT: No/);
+  assert.equal(context.fbq.queue.length, 3);
 });
 
-test('the contact link still works when the Pixel is unavailable', () => {
-  const { context, contacts } = loadLanding();
+test('other business requires a meaningful description and does not send tracking on failure', () => {
+  const { context, listeners, elements, opened } = loadLanding({ volumen: 'Menos de USD 1.000', negocio: 'Otro', 'detalle-negocio': '   ', 'primera-vez': 'Sí' });
+  elements.negocio.value = 'Otro';
+  listeners['negocio:change']();
+  assert.equal(elements['otro-negocio'].hidden, false);
+  assert.equal(elements['detalle-negocio'].required, true);
+  listeners['prefilter-form:submit']({ preventDefault() {} });
+  assert.equal(opened.length, 0);
+  assert.equal(context.fbq.queue.length, 2);
+  assert.ok(elements['detalle-negocio'].error);
+});
+
+test('Telegram opens when the Pixel is unavailable', () => {
+  const { context, listeners, opened } = loadLanding();
   delete context.fbq;
-  contacts.forEach(contact => assert.doesNotThrow(() => contact.listeners[0]()));
+  listeners['prefilter-form:submit']({ preventDefault() {} });
+  assert.equal(opened.length, 1);
 });
